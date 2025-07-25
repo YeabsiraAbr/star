@@ -66,7 +66,7 @@ export default function LotterySpinner() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#001f3f] via-[#0f1b3d] to-[#150734] text-white flex flex-col items-center justify-center px-4">
       <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-yellow-400">
-        🎡 Spin & Win!
+        🎡 yeshhhh!
       </h1>
 
       <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 w-full max-w-xl shadow-2xl">
