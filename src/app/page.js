@@ -1,15 +1,24 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Confetti from "react-confetti"
 import { ShipWheelIcon as Wheel } from "lucide-react"
 
-const defaultParticipants = []
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max)
-}
+// Use a specific key for localStorage to avoid conflicts
+const LOCAL_STORAGE_KEY = "lotteryParticipants"
+// Default to empty array if nothing in localStorage
+const loadParticipantsFromLocalStorage = () => {
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Failed to parse participants from localStorage:", e);
+      return []; // Return empty array on error
+    }
+  }
+  return [];
+};
 
 const colors = [
   "#FF6B6B",
@@ -24,8 +33,13 @@ const colors = [
   "#85C1E9",
 ]
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max)
+}
+
 export default function LotterySpinner() {
-  const [participants, setParticipants] = useState(defaultParticipants)
+  // Initialize participants from localStorage or as an empty array
+  const [participants, setParticipants] = useState(loadParticipantsFromLocalStorage)
   const [input, setInput] = useState("")
   const [spinning, setSpinning] = useState(false)
   const [wheelRotation, setWheelRotation] = useState(0)
@@ -34,6 +48,7 @@ export default function LotterySpinner() {
   const [confettiKey, setConfettiKey] = useState(0)
   const [windowSize, setWindowSize] = useState({ width: 600, height: 600 })
 
+  // Load window size for confetti
   useEffect(() => {
     if (typeof window !== "undefined") {
       const updateSize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight })
@@ -42,6 +57,17 @@ export default function LotterySpinner() {
       return () => window.removeEventListener("resize", updateSize)
     }
   }, [])
+
+  // Save participants to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+       try {
+         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(participants));
+       } catch (e) {
+         console.error("Failed to save participants to localStorage:", e);
+       }
+    }
+  }, [participants]); // Dependency array: run effect when 'participants' changes
 
   const addParticipant = () => {
     if (input.trim() && !participants.includes(input.trim())) {
@@ -52,6 +78,7 @@ export default function LotterySpinner() {
 
   const removeParticipant = (index) => {
     setParticipants(participants.filter((_, i) => i !== index))
+    // Optional: Also clear winner if the removed participant was the winner
     if (winnerIdx === index) setWinnerIdx(null)
   }
 
@@ -66,27 +93,29 @@ export default function LotterySpinner() {
     const baseSpins = 6
     const endAngle = 360 - winner * segmentAngle - segmentAngle / 2 + 360 * baseSpins
     setWheelRotation((prev) => prev + endAngle)
-
     setTimeout(() => {
       setShowConfetti(true)
       setSpinning(false)
     }, 5000) // sync with animation duration
   }
 
-  // Reset the lottery for a new round
+  // Reset the lottery for a new round AND clear localStorage
   const resetLottery = () => {
-    setParticipants(defaultParticipants)
+    setParticipants([]) // This will trigger the useEffect to save []
     setWinnerIdx(null)
     setWheelRotation(0)
     setShowConfetti(false)
+    if (typeof window !== "undefined") {
+        localStorage.removeItem(LOCAL_STORAGE_KEY); // Explicitly clear on reset
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#001f3f] via-[#0f1b3d] to-[#150734] text-white flex flex-col items-center justify-center px-4">
-      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-yellow-400">
-        🎡 Spin & Win!
-      </h1>
-
+    <div className="min-h-screen bg-gradient-to-br from-[#032852] via-[#032852] to-[#032852] text-white flex flex-col items-center justify-center px-4">
+      {/* Replace title with image */}
+      <div className="mb-6 flex justify-center w-full">
+        <img src="/ethiolottery.png" alt="Ethiolottery" className="h-20 md:h-28 object-contain w-full max-w-6xl" onError={e => { e.target.onerror = null; e.target.src = '/Ethiolotteryet-05.png'; }} />
+      </div>
       <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 w-full max-w-xl shadow-2xl">
         {/* Only show input form when there's no winner */}
         {winnerIdx === null && (
@@ -105,13 +134,21 @@ export default function LotterySpinner() {
                 onClick={addParticipant}
                 disabled={!input.trim() || participants.includes(input.trim()) || spinning}
               >
-                Add
+                ጨምር
               </button>
+              {/* Add Reset Button 
+              <button
+                className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 disabled:opacity-50 ml-2"
+                onClick={resetLottery}
+                disabled={participants.length === 0 || spinning}
+              >
+                Reset All
+              </button>*/}
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {participants.map((p, idx) => (
                 <span
-                  key={p}
+                  key={`${p}-${idx}`} // Key should ideally be unique ID, but name+index is better than just name if duplicates are prevented
                   className="bg-yellow-100 text-yellow-900 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
                 >
                   {p}
@@ -127,7 +164,6 @@ export default function LotterySpinner() {
             </div>
           </>
         )}
-
         <div className="flex justify-center my-8 relative">
           <div className="relative w-[24rem] h-[24rem]">
             {/* Arrow Pointer */}
@@ -140,7 +176,6 @@ export default function LotterySpinner() {
                 </div>
               )}
             </div>
-
             {/* SVG Wheel */}
             <motion.div
               className="w-full h-full"
@@ -153,37 +188,30 @@ export default function LotterySpinner() {
               <svg width="384" height="384" className="drop-shadow-2xl" viewBox="0 0 384 384">
                 {/* Outer Ring */}
                 <circle cx="192" cy="192" r="182" fill="none" stroke="#FCD34D" strokeWidth="12" />
-
                 {/* Wheel Segments */}
                 {participants.length > 0 ? (
                   participants.map((participant, index) => {
                     const segmentAngle = 360 / participants.length
                     const startAngle = index * segmentAngle - 90
                     const endAngle = (index + 1) * segmentAngle - 90
-
                     const startAngleRad = (startAngle * Math.PI) / 180
                     const endAngleRad = (endAngle * Math.PI) / 180
-
                     const x1 = 192 + 170 * Math.cos(startAngleRad)
                     const y1 = 192 + 170 * Math.sin(startAngleRad)
                     const x2 = 192 + 170 * Math.cos(endAngleRad)
                     const y2 = 192 + 170 * Math.sin(endAngleRad)
-
                     const largeArcFlag = segmentAngle > 180 ? 1 : 0
-
                     const pathData = [
                       `M 192 192`,
                       `L ${x1} ${y1}`,
                       `A 170 170 0 ${largeArcFlag} 1 ${x2} ${y2}`,
                       "Z",
                     ].join(" ")
-
                     // Text position
                     const textAngle = startAngle + segmentAngle / 2
                     const textAngleRad = (textAngle * Math.PI) / 180
                     const textX = 192 + 120 * Math.cos(textAngleRad)
                     const textY = 192 + 120 * Math.sin(textAngleRad)
-
                     return (
                       <g key={index}>
                         <path d={pathData} fill={colors[index % colors.length]} stroke="#1E3A8A" strokeWidth="2" />
@@ -209,11 +237,9 @@ export default function LotterySpinner() {
                   // Empty wheel background
                   <circle cx="192" cy="192" r="170" fill="#1e1e2f" stroke="#1E3A8A" strokeWidth="2" />
                 )}
-
                 {/* Center Circle */}
                 <circle cx="192" cy="192" r="30" fill="#FCD34D" stroke="#1E3A8A" strokeWidth="4" />
               </svg>
-
               {/* Center Icon */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
                 <Wheel className="w-8 h-8" />
@@ -221,7 +247,6 @@ export default function LotterySpinner() {
             </motion.div>
           </div>
         </div>
-
         <div className="flex flex-col items-center gap-4">
           {/* Show Spin button only if no winner */}
           {winnerIdx === null && (
@@ -230,18 +255,15 @@ export default function LotterySpinner() {
               disabled={spinning || participants.length < 2}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-300 to-yellow-500 text-black font-bold text-lg shadow hover:scale-105 transition disabled:opacity-50"
             >
-              {spinning ? "Spinning..." : "Spin the Wheel"}
+              {spinning ? "እየውጣ ነው..." : "እጣዎን ያውጡ"}
             </button>
           )}
-
           {participants.length < 2 && participants.length > 0 && (
             <p className="text-yellow-300 text-center text-sm">Add at least 2 participants to spin the wheel</p>
           )}
-
           {participants.length === 0 && (
             <p className="text-white/60 text-center text-sm">Add participants to get started</p>
           )}
-
           <AnimatePresence>
             {winnerIdx !== null && !spinning && (
               <motion.div
@@ -262,12 +284,22 @@ export default function LotterySpinner() {
                   <span className="text-green-500">🏆</span>
                   <span className="tracking-wide">{participants[winnerIdx]}</span>
                 </div>
+                 {/* Option to start a new draw keeping the names 
+                 <button
+                   onClick={() => {
+                     setWinnerIdx(null);
+                     setWheelRotation(0); // Optionally reset rotation
+                     setShowConfetti(false);
+                   }}
+                   className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                 >
+                   New Draw (Keep Names)
+                 </button>*/}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
-
       {/* Confetti from center */}
       {showConfetti && (
         <Confetti
@@ -287,10 +319,6 @@ export default function LotterySpinner() {
           }}
         />
       )}
-
-      <div className="mt-10 text-xs text-white/40 text-center">
-        Made with ❤️ using React, Tailwind, Framer Motion & Confetti
-      </div>
     </div>
   )
 }
