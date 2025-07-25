@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Confetti from "react-confetti"
 import { ShipWheelIcon as Wheel } from "lucide-react"
+import { X } from "lucide-react"
 
 const defaultParticipants = []
 
@@ -33,6 +34,7 @@ export default function LotterySpinner() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [confettiKey, setConfettiKey] = useState(0)
   const [windowSize, setWindowSize] = useState({ width: 600, height: 600 })
+  const [lastDraw, setLastDraw] = useState([])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -43,12 +45,43 @@ export default function LotterySpinner() {
     }
   }, [])
 
-  const addParticipant = () => {
-    if (input.trim() && !participants.includes(input.trim())) {
-      setParticipants([...participants, input.trim()])
-      setInput("")
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("lastDraw")
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        // Only keep valid strings
+        const valid = Array.isArray(parsed)
+          ? parsed.filter(p => typeof p === "string")
+          : []
+        setLastDraw(valid)
+      } catch {
+        setLastDraw([])
+      }
     }
   }
+}, [])
+
+
+useEffect(() => {
+  if (winnerIdx !== null && !spinning) {
+    const valid = participants.filter(p => typeof p === "string")
+    localStorage.setItem("lastDraw", JSON.stringify(valid))
+    setLastDraw(valid)
+  }
+}, [winnerIdx, spinning])
+
+
+
+ const addParticipant = () => {
+  const name = String(input).trim()
+  if (name && !participants.includes(name)) {
+    setParticipants([...participants, name])
+    setInput("")
+  }
+}
+
 
   const removeParticipant = (index) => {
     setParticipants(participants.filter((_, i) => i !== index))
@@ -75,17 +108,18 @@ export default function LotterySpinner() {
 
   // Reset the lottery for a new round
   const resetLottery = () => {
-    setParticipants(defaultParticipants)
+    setParticipants(lastDraw)
     setWinnerIdx(null)
     setWheelRotation(0)
     setShowConfetti(false)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#001f3f] via-[#0f1b3d] to-[#150734] text-white flex flex-col items-center justify-center px-4">
-      <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-center tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-white to-yellow-400">
-        🎡 Spin & Win!
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#032852] via-[#032852] to-[#032852] text-white flex flex-col items-center justify-center px-4">
+      {/* Replace title with image */}
+      <div className="mb-6 flex justify-center w-full">
+        <img src="/ethiolottery.png" alt="Ethiolottery" className="h-20 md:h-28 object-contain w-full max-w-6xl" onError={e => { e.target.onerror = null; e.target.src = '/Ethiolotteryet-05.png'; }} />
+      </div>
 
       <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 w-full max-w-xl shadow-2xl">
         {/* Only show input form when there's no winner */}
@@ -110,11 +144,8 @@ export default function LotterySpinner() {
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {participants.map((p, idx) => (
-                <span
-                  key={p}
-                  className="bg-yellow-100 text-yellow-900 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
-                >
-                  {p}
+  <span key={idx} className="...">
+    {typeof p === 'string' ? p : ""}
                   <button
                     className="text-red-500 hover:text-red-700"
                     onClick={() => removeParticipant(idx)}
@@ -126,6 +157,33 @@ export default function LotterySpinner() {
               ))}
             </div>
           </>
+        )}
+
+        {/* Show last draw participants if available, only when no draw is active */}
+        {winnerIdx === null && lastDraw.length > 0 && (
+          <div className="mb-8">
+           {/*  <h3 className="text-white text-lg font-semibold mb-3">Last Draw Participants ({lastDraw.length})</h3> */}
+            <div className="flex flex-wrap gap-2">
+              {lastDraw.map((participant, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-yellow-100  text-yellow-900`}
+                >
+                  {typeof participant === 'string' ? participant : JSON.stringify(participant)}
+                  <button
+                    onClick={() => {
+                      const updated = lastDraw.filter((_, i) => i !== index)
+                      setLastDraw(updated)
+                      localStorage.setItem("lastDraw", JSON.stringify(updated))
+                    }}
+                       className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         <div className="flex justify-center my-8 relative">
@@ -188,20 +246,21 @@ export default function LotterySpinner() {
                       <g key={index}>
                         <path d={pathData} fill={colors[index % colors.length]} stroke="#1E3A8A" strokeWidth="2" />
                         <text
-                          x={textX}
-                          y={textY}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fill="white"
-                          fontSize="16"
-                          fontWeight="bold"
-                          transform={`rotate(${textAngle + 90}, ${textX}, ${textY})`}
-                          className={`drop-shadow-sm ${
-                            winnerIdx === index && !spinning ? "fill-yellow-300 text-shadow" : ""
-                          }`}
-                        >
-                          {participant}
-                        </text>
+  x={textX}
+  y={textY}
+  textAnchor="middle"
+  dominantBaseline="middle"
+  fill="white"
+  fontSize="16"
+  fontWeight="bold"
+  transform={`rotate(${textAngle + 90}, ${textX}, ${textY})`}
+  className={`drop-shadow-sm ${
+    winnerIdx === index && !spinning ? "fill-yellow-300 text-shadow" : ""
+  }`}
+>
+  {typeof participant === "string" ? participant : ""}
+</text>
+
                       </g>
                     )
                   })
@@ -230,12 +289,12 @@ export default function LotterySpinner() {
               disabled={spinning || participants.length < 2}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-300 to-yellow-500 text-black font-bold text-lg shadow hover:scale-105 transition disabled:opacity-50"
             >
-              {spinning ? "Spinning..." : "Spin the Wheel"}
+              {spinning ? "እየውጣ ነው. . ." : "እጣዎን ያውጡ"}
             </button>
           )}
 
           {participants.length < 2 && participants.length > 0 && (
-            <p className="text-yellow-300 text-center text-sm">Add at least 2 participants to spin the wheel</p>
+           {/* <p className="text-yellow-300 text-center text-sm">Add at least 2 participants to spin the wheel</p>*/}
           )}
 
           {participants.length === 0 && (
@@ -287,10 +346,6 @@ export default function LotterySpinner() {
           }}
         />
       )}
-
-      <div className="mt-10 text-xs text-white/40 text-center">
-        Made with ❤️ using React, Tailwind, Framer Motion & Confetti
-      </div>
     </div>
   )
 }
