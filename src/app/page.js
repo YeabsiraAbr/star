@@ -134,7 +134,7 @@ export default function LotterySpinner() {
                 onClick={addParticipant}
                 disabled={!input.trim() || participants.includes(input.trim()) || spinning}
               >
-                Add
+                ጨምር
               </button>
               {/* Add Reset Button 
               <button
@@ -255,7 +255,7 @@ export default function LotterySpinner() {
               disabled={spinning || participants.length < 2}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-300 to-yellow-500 text-black font-bold text-lg shadow hover:scale-105 transition disabled:opacity-50"
             >
-              {spinning ? "Spinning..." : "Spin the Wheel"}
+              {spinning ? "እየውጣ ነው..." : "እጣዎን ያውጡ"}
             </button>
           )}
           {participants.length < 2 && participants.length > 0 && (
