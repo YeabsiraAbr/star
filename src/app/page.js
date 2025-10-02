@@ -20,17 +20,12 @@ const loadParticipantsFromLocalStorage = () => {
   return [];
 };
 
+// Updated colors to match black and orange theme
 const colors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEAA7",
-  "#DDA0DD",
-  "#98D8C8",
-  "#F7DC6F",
-  "#BB8FCE",
-  "#85C1E9",
+  "#FF531A", // Primary orange
+  "#FF6B35",
+  "#FF8C42",
+  "#FFA85C"
 ]
 
 function getRandomInt(max) {
@@ -109,20 +104,26 @@ export default function LotterySpinner() {
         localStorage.removeItem(LOCAL_STORAGE_KEY); // Explicitly clear on reset
     }
   }
-
+ 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#032852] via-[#032852] to-[#032852] text-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-white text-white flex flex-col items-center justify-center px-4 transition-all duration-300">
       {/* Replace title with image */}
       <div className="mb-6 flex justify-center w-full">
-        <img src="/ethiolottery.png" alt="Ethiolottery" className="h-20 md:h-28 object-contain w-full max-w-6xl" onError={e => { e.target.onerror = null; e.target.src = '/Ethiolotteryet-05.png'; }} />
+        <img 
+          src="/TameKUB-02.png" 
+          alt="Ethiolottery" 
+          className="h-20 md:h-28 object-contain w-full max-w-6xl drop-shadow-lg" 
+          onError={e => { e.target.onerror = null; e.target.src = '/Ethiolotteryet-05.png'; }} 
+        />
       </div>
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 w-full max-w-xl shadow-2xl">
+
+      <div className="bg-[#F6F7F9] rounded-3xl p-8 w-full max-w-xl shadow-2xl border border-orange-500/20">
         {/* Only show input form when there's no winner */}
         {winnerIdx === null && (
           <>
             <div className="flex gap-2 mb-4">
               <input
-                className="flex-1 px-4 py-2 rounded-lg bg-white/90 text-gray-800 placeholder-gray-500 focus:outline-none"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none border border-gray-600 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
                 placeholder="Enter participant name"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -130,30 +131,22 @@ export default function LotterySpinner() {
                 disabled={spinning}
               />
               <button
-                className="bg-yellow-400 text-black font-bold px-4 py-2 rounded-lg hover:bg-yellow-300 disabled:opacity-50"
+                className="bg-orange-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 shadow-lg transition-all hover:scale-105"
                 onClick={addParticipant}
                 disabled={!input.trim() || participants.includes(input.trim()) || spinning}
               >
                 ጨምር
               </button>
-              {/* Add Reset Button 
-              <button
-                className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 disabled:opacity-50 ml-2"
-                onClick={resetLottery}
-                disabled={participants.length === 0 || spinning}
-              >
-                Reset All
-              </button>*/}
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {participants.map((p, idx) => (
                 <span
-                  key={`${p}-${idx}`} // Key should ideally be unique ID, but name+index is better than just name if duplicates are prevented
-                  className="bg-yellow-100 text-yellow-900 px-3 py-1 rounded-full flex items-center gap-2 text-sm"
+                  key={`${p}-${idx}`}
+                  className="bg-gray-700 text-white px-3 py-1 rounded-full flex items-center gap-2 text-sm border border-orange-500/30 shadow-sm backdrop-blur-sm"
                 >
                   {p}
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="text-white hover:text-red-500 font-bold transition-colors"
                     onClick={() => removeParticipant(idx)}
                     disabled={spinning}
                   >
@@ -164,18 +157,20 @@ export default function LotterySpinner() {
             </div>
           </>
         )}
+        
         <div className="flex justify-center my-8 relative">
           <div className="relative w-[24rem] h-[24rem]">
             {/* Arrow Pointer */}
-            <div className="absolute top-[-16px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-[24px] border-transparent border-b-yellow-400 z-10">
+            <div className="absolute top-[-16px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-[24px] border-transparent border-b-orange-500 z-10 drop-shadow-lg">
               {winnerIdx !== null && !spinning && (
                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
-                  <div className="text-xs font-bold bg-yellow-400 text-black px-2 py-1 rounded">
+                  <div className="text-xs font-bold bg-orange-500 text-white px-2 py-1 rounded shadow-lg">
                     {participants[winnerIdx]}
                   </div>
                 </div>
               )}
             </div>
+            
             {/* SVG Wheel */}
             <motion.div
               className="w-full h-full"
@@ -187,7 +182,7 @@ export default function LotterySpinner() {
             >
               <svg width="384" height="384" className="drop-shadow-2xl" viewBox="0 0 384 384">
                 {/* Outer Ring */}
-                <circle cx="192" cy="192" r="182" fill="none" stroke="#FCD34D" strokeWidth="12" />
+                <circle cx="192" cy="192" r="182" fill="none" stroke="#FF531A" strokeWidth="12" />
                 {/* Wheel Segments */}
                 {participants.length > 0 ? (
                   participants.map((participant, index) => {
@@ -214,18 +209,18 @@ export default function LotterySpinner() {
                     const textY = 192 + 120 * Math.sin(textAngleRad)
                     return (
                       <g key={index}>
-                        <path d={pathData} fill={colors[index % colors.length]} stroke="#1E3A8A" strokeWidth="2" />
+                        <path d={pathData} fill={colors[index % colors.length]} stroke="#1a1a1a" strokeWidth="2" />
                         <text
                           x={textX}
                           y={textY}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                          fill="white"
-                          fontSize="16"
+                          fill="#fff"
+                          fontSize="14"
                           fontWeight="bold"
                           transform={`rotate(${textAngle + 90}, ${textX}, ${textY})`}
                           className={`drop-shadow-sm ${
-                            winnerIdx === index && !spinning ? "fill-yellow-300 text-shadow" : ""
+                            winnerIdx === index && !spinning ? "fill-orange-300" : ""
                           }`}
                         >
                           {participant}
@@ -235,35 +230,40 @@ export default function LotterySpinner() {
                   })
                 ) : (
                   // Empty wheel background
-                  <circle cx="192" cy="192" r="170" fill="#1e1e2f" stroke="#1E3A8A" strokeWidth="2" />
+                  <circle cx="192" cy="192" r="170" fill="#374151" stroke="#FF531A" strokeWidth="2" />
                 )}
                 {/* Center Circle */}
-                <circle cx="192" cy="192" r="30" fill="#FCD34D" stroke="#1E3A8A" strokeWidth="4" />
+                <circle cx="192" cy="192" r="30" fill="#FF531A" stroke="#1a1a1a" strokeWidth="4" />
               </svg>
+              
               {/* Center Icon */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
                 <Wheel className="w-8 h-8" />
               </div>
             </motion.div>
           </div>
         </div>
+        
         <div className="flex flex-col items-center gap-4">
           {/* Show Spin button only if no winner */}
           {winnerIdx === null && (
             <button
               onClick={startSpin}
               disabled={spinning || participants.length < 2}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-300 to-yellow-500 text-black font-bold text-lg shadow hover:scale-105 transition disabled:opacity-50"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg shadow-lg hover:scale-105 transition disabled:opacity-50 border border-orange-400 hover:shadow-orange-500/25 hover:shadow-xl"
             >
               {spinning ? "እየውጣ ነው..." : "እጣዎን ያውጡ"}
             </button>
           )}
+          
           {participants.length < 2 && participants.length > 0 && (
-            <p className="text-yellow-300 text-center text-sm">Add at least 2 participants to spin the wheel</p>
+            <p className="text-orange-400 text-center text-sm">Add at least 2 participants to spin the wheel</p>
           )}
+          
           {participants.length === 0 && (
-            <p className="text-white/60 text-center text-sm">Add participants to get started</p>
+            <p className="text-gray-400 text-center text-sm">Add participants to get started</p>
           )}
+          
           <AnimatePresence>
             {winnerIdx !== null && !spinning && (
               <motion.div
@@ -275,31 +275,21 @@ export default function LotterySpinner() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-4xl animate-bounce">🎉</span>
-                  <span className="text-3xl font-extrabold text-gradient bg-gradient-to-r from-green-400 via-yellow-300 to-green-400 bg-clip-text text-transparent drop-shadow-lg">
-                    Winner!
+                  <span className="text-3xl font-extrabold bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-lg">
+                    አሸናፊ!
                   </span>
                   <span className="text-4xl animate-bounce">🎉</span>
                 </div>
-                <div className="mt-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-yellow-300 via-white to-green-400 text-black font-extrabold text-3xl shadow-lg border-4 border-yellow-400 drop-shadow-xl flex items-center gap-2">
-                  <span className="text-green-500">🏆</span>
+                <div className="mt-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 text-white font-extrabold text-3xl shadow-lg border-4 border-orange-300 drop-shadow-xl flex items-center gap-2">
+                  <span className="text-yellow-300">🏆</span>
                   <span className="tracking-wide">{participants[winnerIdx]}</span>
                 </div>
-                 {/* Option to start a new draw keeping the names 
-                 <button
-                   onClick={() => {
-                     setWinnerIdx(null);
-                     setWheelRotation(0); // Optionally reset rotation
-                     setShowConfetti(false);
-                   }}
-                   className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                 >
-                   New Draw (Keep Names)
-                 </button>*/}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+      
       {/* Confetti from center */}
       {showConfetti && (
         <Confetti
@@ -311,6 +301,7 @@ export default function LotterySpinner() {
           gravity={0.3}
           wind={0.01}
           initialVelocityY={25}
+          colors={['#FF531A', '#FF6B35', '#FF8C42', '#FFA85C', '#FFFFFF']}
           confettiSource={{
             x: windowSize.width / 2 - 100,
             y: windowSize.height / 2 - 100,
