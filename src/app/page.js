@@ -236,13 +236,13 @@ export default function LotterySpinner() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-white flex flex-col items-center justify-center px-4 transition-all duration-300">
+    <div className="min-h-screen bg-white text-white flex flex-col items-center justify-center px-4 py-4 transition-all duration-300">
       {/* Replace title with image */}
-      <div className="mb-6 flex justify-center w-full">
+      <div className="mb-4 flex justify-center w-full">
         <img
           src="/TameKUB-02.png"
           alt="Ethiolottery"
-          className="h-20 md:h-28 object-contain w-full max-w-6xl drop-shadow-lg"
+          className="h-16 md:h-20 object-contain w-full max-w-4xl drop-shadow-lg"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = "/Ethiolotteryet-05.png";
@@ -250,7 +250,7 @@ export default function LotterySpinner() {
         />
       </div>
 
-      <div className="bg-[#F6F7F9] rounded-3xl p-8 w-full max-w-xl shadow-2xl border border-orange-500/20">
+      <div className="bg-[#F6F7F9] rounded-3xl p-6 w-full max-w-xl shadow-2xl border border-orange-500/20">
         {/* Only show input form when there's no winner */}
         {winnerIdx === null && (
           <>
@@ -304,23 +304,25 @@ export default function LotterySpinner() {
           </>
         )}
 
-        {/* Cycling Name Display */}
-        {spinning && cyclingName && (
-          <div className="mb-6 flex justify-center">
+        {/* Cycling Name Display / Winner Display */}
+        {(spinning && cyclingName) || (winnerIdx !== null && !spinning) ? (
+          <div className="mb-4 flex justify-center">
             <motion.div
-              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-2xl shadow-2xl border-4 border-orange-300 min-w-[200px] text-center"
-              key={cyclingName}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-xl shadow-2xl border-4 border-orange-300 min-w-[180px] text-center"
+              key={spinning ? cyclingName : participants[winnerIdx]}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.1 }}
             >
-              <span className="tracking-wide">{cyclingName}</span>
+              <span className="tracking-wide">
+                {spinning ? cyclingName : participants[winnerIdx]}
+              </span>
             </motion.div>
           </div>
-        )}
+        ) : null}
 
-        <div className="flex justify-center my-8 relative">
-          <div className="relative w-[24rem] h-[24rem]">
+        <div className="flex justify-center my-6 relative">
+          <div className="relative w-[20rem] h-[20rem]">
             {/* Arrow Pointer */}
             <div className="absolute top-[-16px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-[24px] border-transparent border-b-orange-500 z-10 drop-shadow-lg"></div>
 
@@ -334,19 +336,19 @@ export default function LotterySpinner() {
               }}
             >
               <svg
-                width="384"
-                height="384"
+                width="320"
+                height="320"
                 className="drop-shadow-2xl"
-                viewBox="0 0 384 384"
+                viewBox="0 0 320 320"
               >
                 {/* Outer Ring */}
                 <circle
-                  cx="192"
-                  cy="192"
-                  r="182"
+                  cx="160"
+                  cy="160"
+                  r="150"
                   fill="none"
                   stroke="#FF531A"
-                  strokeWidth="12"
+                  strokeWidth="10"
                 />
                 {/* Wheel Segments */}
                 {participants.length > 0 ? (
@@ -356,15 +358,15 @@ export default function LotterySpinner() {
                     const endAngle = (index + 1) * segmentAngle - 90;
                     const startAngleRad = (startAngle * Math.PI) / 180;
                     const endAngleRad = (endAngle * Math.PI) / 180;
-                    const x1 = 192 + 170 * Math.cos(startAngleRad);
-                    const y1 = 192 + 170 * Math.sin(startAngleRad);
-                    const x2 = 192 + 170 * Math.cos(endAngleRad);
-                    const y2 = 192 + 170 * Math.sin(endAngleRad);
+                    const x1 = 160 + 140 * Math.cos(startAngleRad);
+                    const y1 = 160 + 140 * Math.sin(startAngleRad);
+                    const x2 = 160 + 140 * Math.cos(endAngleRad);
+                    const y2 = 160 + 140 * Math.sin(endAngleRad);
                     const largeArcFlag = segmentAngle > 180 ? 1 : 0;
                     const pathData = [
-                      `M 192 192`,
+                      `M 160 160`,
                       `L ${x1} ${y1}`,
-                      `A 170 170 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+                      `A 140 140 0 ${largeArcFlag} 1 ${x2} ${y2}`,
                       "Z",
                     ].join(" ");
                     return (
@@ -386,9 +388,9 @@ export default function LotterySpinner() {
                 ) : (
                   // Empty wheel background
                   <circle
-                    cx="192"
-                    cy="192"
-                    r="170"
+                    cx="160"
+                    cy="160"
+                    r="140"
                     fill="#374151"
                     stroke="#FF531A"
                     strokeWidth="2"
@@ -396,24 +398,24 @@ export default function LotterySpinner() {
                 )}
                 {/* Center Circle */}
                 <circle
-                  cx="192"
-                  cy="192"
-                  r="30"
+                  cx="160"
+                  cy="160"
+                  r="25"
                   fill="#FF531A"
                   stroke="#1a1a1a"
-                  strokeWidth="4"
+                  strokeWidth="3"
                 />
               </svg>
 
               {/* Center Icon */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
-                <Wheel className="w-8 h-8" />
+                <Wheel className="w-6 h-6" />
               </div>
             </motion.div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           {/* Show Spin button only if no winner */}
           {winnerIdx === null && (
             <button
@@ -440,26 +442,20 @@ export default function LotterySpinner() {
           <AnimatePresence>
             {winnerIdx !== null && !spinning && (
               <motion.div
-                className="flex flex-col items-center justify-center gap-4 mt-8"
+                className="flex flex-col items-center justify-center gap-2 mt-4"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: 20 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-5xl animate-bounce">🎉</span>
-                  <span className="text-4xl font-extrabold bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl animate-bounce">🎉</span>
+                  <span className="text-2xl font-extrabold bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-lg">
                     አሸናፊ!
                   </span>
-                  <span className="text-5xl animate-bounce">🎉</span>
+                  <span className="text-3xl animate-bounce">🎉</span>
                 </div>
-                <div className="mt-4 px-8 py-4 rounded-3xl bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500 text-white font-extrabold text-4xl shadow-2xl border-4 border-orange-300 drop-shadow-2xl flex items-center gap-3 min-w-[300px] justify-center">
-                  <span className="text-yellow-300 text-5xl">🏆</span>
-                  <span className="tracking-wide text-center">
-                    {participants[winnerIdx]}
-                  </span>
-                </div>
-                <div className="text-orange-600 text-lg font-semibold mt-2 animate-pulse">
+                <div className="text-orange-600 text-base font-semibold animate-pulse">
                   Congratulations! 🎊
                 </div>
               </motion.div>
