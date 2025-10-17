@@ -23,12 +23,12 @@ const PRIZES = [
     id: 2,
     place: "2nd Prize",
     amount: "15,000",
-    color: "from-slate-200 via-gray-100 to-slate-300",
+    color: "from-cyan-400 via-blue-400 to-cyan-500",
     icon: Award,
-    bgGlow: "bg-slate-300/20",
-    borderColor: "border-slate-300",
-    textColor: "text-slate-200",
-    confettiColors: ["#E8E8E8", "#F0F0F0", "#D3D3D3", "#FFFFFF"],
+    bgGlow: "bg-cyan-400/20",
+    borderColor: "border-cyan-400",
+    textColor: "text-cyan-400",
+    confettiColors: ["#22D3EE", "#38BDF8", "#60A5FA", "#93C5FD"],
     showFullNumber: true,
     showPhone: true,
   },
@@ -126,20 +126,29 @@ export default function DailyLotteryPage() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     try {
-      console.log("Calling API...");
-      // Call the actual API
+      console.log("Calling API with amount:", prize.amount);
+
+      // Call the actual API with POST request
       const response = await fetch(
-        "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/68d39adc64e63632f0f75e00"
+        "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/68d39adc64e63632f0f75e00",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: parseInt(prize.amount.replace(/,/g, "")), // Remove commas and convert to number
+          }),
+        }
       );
       const data = await response.json();
       console.log("API Response:", data);
 
       clearInterval(interval);
 
-      if (data.status === "SUCCESS" && data.winner && data.user) {
-        // Extract winner data from API response
-        const fullLotteryNumber =
-          data.winner.ticketNumber || data.data.ticketNumber;
+      if (data.status === "SUCCESS" && data.winner) {
+        // Extract winner data from new API response format
+        const fullLotteryNumber = data.winner.ticketNumber;
         const displayNumber = prize.showFullNumber
           ? fullLotteryNumber
           : fullLotteryNumber.slice(-1); // Last digit only
@@ -147,8 +156,9 @@ export default function DailyLotteryPage() {
         const winnerData = {
           lotteryNumber: fullLotteryNumber,
           displayNumber: displayNumber,
-          phoneNumber: data.user.phoneNumber,
+          phoneNumber: data.winner.phoneNumber,
           drawnAt: data.winner.drawnAt,
+          amount: data.winner.amount,
         };
 
         console.log("Winner data:", winnerData);
@@ -172,7 +182,7 @@ export default function DailyLotteryPage() {
         // Handle API error
         console.error("API returned error:", data);
         clearInterval(interval);
-        alert("Failed to draw winner. Please try again.");
+        alert(`Failed to draw winner: ${data.message || "Unknown error"}`);
         setCurrentStep("idle");
       }
     } catch (error) {
