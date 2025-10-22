@@ -126,43 +126,67 @@ export default function DailyLotteryPage() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     try {
-      console.log("Calling API with amount:", prize.amount);
+      // Use different API endpoint for 4th prize (consolation prize)
+      const is4thPrize = prizeIndex === 3;
+      const apiUrl = is4thPrize
+        ? "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawConsolationPrize/daily"
+        : "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/daily";
 
-      // Call the actual API with POST request
-      const response = await fetch(
-        "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/68d39adc64e63632f0f75e00",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: parseInt(prize.amount.replace(/,/g, "")), // Remove commas and convert to number
-          }),
-        }
-      );
+      console.log(`Calling API for prize ${prizeIndex + 1}:`, apiUrl);
+
+      // All prizes use POST request with amount in body
+      const fetchOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: parseInt(prize.amount.replace(/,/g, "")), // Remove commas and convert to number (5 for 4th prize)
+        }),
+      };
+
+      const response = await fetch(apiUrl, fetchOptions);
       const data = await response.json();
       console.log("API Response:", data);
 
       clearInterval(interval);
 
-      if (data.status === "SUCCESS" && data.winner) {
-        // Extract winner data from new API response format
-        const fullLotteryNumber = data.winner.ticketNumber;
-        const displayNumber = prize.showFullNumber
-          ? fullLotteryNumber
-          : fullLotteryNumber.slice(-1); // Last digit only
+      if (data.status === "SUCCESS") {
+        let winnerData;
 
-        const winnerData = {
-          lotteryNumber: fullLotteryNumber,
-          displayNumber: displayNumber,
-          phoneNumber: data.winner.phoneNumber,
-          drawnAt: data.winner.drawnAt,
-          amount: data.winner.amount,
-        };
+        if (is4thPrize && data.randomDigit !== undefined) {
+          // Handle 4th prize (consolation prize) response
+          winnerData = {
+            lotteryNumber: data.randomDigit, // Store the digit
+            displayNumber: data.randomDigit, // Show the digit
+            phoneNumber: "", // No phone number for 4th prize
+            drawnAt:
+              data.winners && data.winners.length > 0
+                ? data.winners[0].drawnAt
+                : new Date().toISOString(),
+            amount: 5,
+            totalWinners: data.winners ? data.winners.length : 0,
+          };
+        } else if (data.winner) {
+          // Handle regular prize response
+          const fullLotteryNumber = data.winner.ticketNumber;
+          const displayNumber = prize.showFullNumber
+            ? fullLotteryNumber
+            : fullLotteryNumber.slice(-1); // Last digit only
+
+          winnerData = {
+            lotteryNumber: fullLotteryNumber,
+            displayNumber: displayNumber,
+            phoneNumber: data.winner.phoneNumber,
+            drawnAt: data.winner.drawnAt,
+            amount: data.winner.amount,
+          };
+        } else {
+          throw new Error("Invalid API response format");
+        }
 
         console.log("Winner data:", winnerData);
-        setRollingNumber(displayNumber);
+        setRollingNumber(winnerData.displayNumber);
         setRollingPhone(winnerData.phoneNumber);
 
         setWinners((prev) => ({
