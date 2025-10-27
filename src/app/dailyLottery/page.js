@@ -129,8 +129,8 @@ export default function DailyLotteryPage() {
       // Use different API endpoint for 4th prize (consolation prize)
       const is4thPrize = prizeIndex === 3;
       const apiUrl = is4thPrize
-        ? "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawConsolationPrize/daily"
-        : "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/daily";
+        ? "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawConsolationPrize/Daily"
+        : "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2/ticket/drawLottery/Daily";
 
       console.log(`Calling API for prize ${prizeIndex + 1}:`, apiUrl);
 
