@@ -7,12 +7,10 @@ import { ShipWheelIcon as Wheel } from "lucide-react";
 // Predefined names for the lottery
 const names = [
   "Yeabsira",
-  "Bethlehem",
   "Nathnael",
   "Dawit",
   "Eleni",
   "Tekle",
-  "Eyuel",
   "Kelab",
   "Solomon",
   "Tadel",
@@ -22,17 +20,18 @@ const names = [
   "Mebrat",
   "Yoseph",
   "Yoseph-Call-2",
-  "Mizan",
   "Kokob",
   "Girum",
   "Tsion",
   "Wende",
   "Haymi",
+  "Haymi2",
   "Frehiwot",
   "Blen",
   "Sami",
   "Abenezer",
   "Yanet",
+  "Yared",
 ];
 
 // Use a specific key for localStorage to avoid conflicts
