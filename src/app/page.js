@@ -20,7 +20,7 @@ const names = [
   "Mebrat",
   "Yoseph",
   "Yoseph-Call-2",
-  "Kokob",
+  "Ermias",
   "Girum",
   "Tsion",
   "Wende",
