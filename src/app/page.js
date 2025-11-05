@@ -26,7 +26,7 @@ const names = [
   "Wende",
   "Haymi",
   "Haymi2",
-  "Frehiwot",
+  "Eyuel",
   "Blen",
   "Sami",
   "Abenezer",
