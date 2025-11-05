@@ -32,6 +32,7 @@ const names = [
   "Abenezer",
   "Yanet",
   "Yared",
+  "Yonas",
 ];
 
 // Use a specific key for localStorage to avoid conflicts
