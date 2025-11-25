@@ -6,7 +6,7 @@ import { saveAs } from "file-saver";
 import Papa from "papaparse";
 
 export default function ExcelCsvSplitter() {
-  const [chunkSize, setChunkSize] = useState(500000);
+  const [chunkSize, setChunkSize] = useState(600000);
   const [loading, setLoading] = useState(false);
   const [fileNamePrefix, setFileNamePrefix] = useState("Newchunk");
   const [progress, setProgress] = useState("");
