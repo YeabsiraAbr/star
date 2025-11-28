@@ -5,7 +5,7 @@ import Confetti from "react-confetti";
 import { Trophy, Phone, Ticket, Sparkles, Star, Crown } from "lucide-react";
 import Image from "next/image";
 
-export default function iPhoneDrawPage() {
+export default function SamsungDrawPage() {
   const [currentStep, setCurrentStep] = useState("idle"); // idle, drawing, winner
   const [winner, setWinner] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -15,10 +15,18 @@ export default function iPhoneDrawPage() {
 
   // Prize configuration
   const PRIZE = {
-    amount: "iPhone 17 Pro Max",
+    amount: "Samsung S25 Ultra",
     title: "GRAND PRIZE",
     titleAmharic: "ታላቅ ሽልማት",
-    confettiColors: ["#EA580C", "#F97316", "#FB923C", "#FDBA74", "#FED7AA"],
+    confettiColors: [
+      "#FFFFFF",
+      "#F5F5F5",
+      "#E8E8E8",
+      "#D3D3D3",
+      "#C0C0C0",
+      "#A9A9A9",
+      "#808080",
+    ],
   };
 
   // Load window size for confetti
@@ -48,7 +56,7 @@ export default function iPhoneDrawPage() {
 
   // Start drawing
   const startDrawing = async () => {
-    console.log("Starting iPhone draw");
+    console.log("Starting Samsung draw");
     setCurrentStep("drawing");
     setShowConfetti(false);
 
@@ -130,12 +138,12 @@ export default function iPhoneDrawPage() {
   const isWinnerShown = currentStep === "winner";
 
   return (
-    <div className="h-screen bg-gradient-to-br from-white via-orange-50 to-orange-100 text-gray-900 flex items-center justify-center px-4 py-3 relative overflow-hidden">
-      {/* Animated background effects */}
+    <div className="h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 text-gray-900 flex items-center justify-center px-4 py-3 relative overflow-hidden">
+      {/* Animated background effects - White theme */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-600/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-300/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-gray-200/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
       {/* Main Content */}
@@ -148,17 +156,17 @@ export default function iPhoneDrawPage() {
             transition={{ duration: 0.5 }}
             className="w-full h-full flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8"
           >
-            {/* iPhone Image Display - Left Side */}
+            {/* Samsung S25 Ultra Image Display - Left Side */}
             <motion.div
               className="flex-shrink-0"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="relative w-64 h-96 md:w-80 md:h-[500px]">
+              <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="iPhone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra"
                   fill
                   className="object-contain rounded-2xl"
                   priority
@@ -176,20 +184,20 @@ export default function iPhoneDrawPage() {
                 transition={{ delay: 0.2 }}
               >
                 <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-2">
-                  <Crown className="w-6 h-6 md:w-8 md:h-8 text-orange-600 animate-pulse flex-shrink-0" />
-                  <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 bg-clip-text text-transparent drop-shadow-lg whitespace-nowrap">
-                    iPhone Lottery Draw
+                  <Crown className="w-6 h-6 md:w-8 md:h-8 text-gray-700 animate-pulse flex-shrink-0" />
+                  <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent drop-shadow-lg whitespace-nowrap">
+                    Samsung Lottery Draw
                   </h1>
-                  <Crown className="w-6 h-6 md:w-8 md:h-8 text-orange-600 animate-pulse flex-shrink-0" />
+                  <Crown className="w-6 h-6 md:w-8 md:h-8 text-gray-700 animate-pulse flex-shrink-0" />
                 </div>
-                <p className="text-lg md:text-xl text-orange-700 font-semibold">
-                  iPhone 17 Pro Max Prize Draw
+                <p className="text-lg md:text-xl text-gray-700 font-semibold">
+                  Samsung S25 Ultra Prize Draw
                 </p>
               </motion.div>
 
               {/* Prize Display */}
               <motion.div
-                className="bg-white rounded-3xl p-6 md:p-8 border-4 border-orange-500 shadow-2xl mb-6 w-full"
+                className="bg-white rounded-3xl p-6 md:p-8 border-4 border-gray-400 shadow-2xl mb-6 w-full"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -200,12 +208,12 @@ export default function iPhoneDrawPage() {
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ repeat: Infinity, duration: 3 }}
                   >
-                    <Trophy className="w-16 h-16 md:w-20 md:h-20 mb-4 text-orange-600" />
+                    <Trophy className="w-16 h-16 md:w-20 md:h-20 mb-4 text-gray-700" />
                   </motion.div>
                   <h2 className="text-xl md:text-2xl font-bold mb-3 text-gray-800">
                     {PRIZE.title}
                   </h2>
-                  <div className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 bg-clip-text text-transparent mb-3">
+                  <div className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent mb-3">
                     {PRIZE.amount}
                   </div>
                   <p className="text-base md:text-lg text-gray-600">
@@ -217,7 +225,7 @@ export default function iPhoneDrawPage() {
               {/* Start Button */}
               <motion.button
                 onClick={startDrawing}
-                className="px-10 md:px-12 py-3 md:py-4 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 rounded-full text-white font-bold text-xl md:text-2xl shadow-2xl hover:shadow-orange-500/50 transition-all border-4 border-white w-full md:w-auto"
+                className="px-10 md:px-12 py-3 md:py-4 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 rounded-full text-white font-bold text-xl md:text-2xl shadow-2xl hover:shadow-gray-500/50 transition-all border-4 border-white w-full md:w-auto"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: 50 }}
@@ -238,17 +246,17 @@ export default function iPhoneDrawPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            {/* iPhone Image - Left Side */}
+            {/* Samsung S25 Ultra Image - Left Side */}
             <motion.div
               className="flex-shrink-0"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="relative w-64 h-96 md:w-80 md:h-[500px]">
+              <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="iPhone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra"
                   fill
                   className="object-contain rounded-2xl"
                 />
@@ -259,7 +267,7 @@ export default function iPhoneDrawPage() {
             <div className="flex flex-col items-center md:items-start flex-1 max-w-2xl">
               {/* Prize Title */}
               <motion.div
-                className="mb-4 text-center md:text-left p-4 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 shadow-2xl border-4 border-white w-full"
+                className="mb-4 text-center md:text-left p-4 rounded-2xl bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 shadow-2xl border-4 border-white w-full"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
@@ -273,13 +281,13 @@ export default function iPhoneDrawPage() {
               </motion.div>
 
               {/* Drawing Animation */}
-              <div className="bg-white rounded-3xl p-4 md:p-6 border-4 border-orange-500 shadow-2xl w-full">
+              <div className="bg-white rounded-3xl p-4 md:p-6 border-4 border-gray-400 shadow-2xl w-full">
                 <motion.div
                   className="text-center mb-4"
                   animate={{ opacity: [1, 0.5, 1] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
                 >
-                  <p className="text-xl md:text-2xl font-bold text-orange-600 mb-1">
+                  <p className="text-xl md:text-2xl font-bold text-gray-700 mb-1">
                     🎰 Drawing in Progress...
                   </p>
                   <p className="text-base md:text-lg text-gray-600">
@@ -290,15 +298,15 @@ export default function iPhoneDrawPage() {
                 {/* Rolling Numbers Display - Side by Side */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
                   {/* Lottery Number */}
-                  <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 border-4 border-orange-600 shadow-lg overflow-hidden min-w-0">
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 border-4 border-gray-500 shadow-lg overflow-hidden min-w-0">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                      <Ticket className="w-5 h-5 md:w-6 md:h-6 text-orange-600 flex-shrink-0" />
+                      <Ticket className="w-5 h-5 md:w-6 md:h-6 text-gray-700 flex-shrink-0" />
                       <p className="text-base md:text-lg font-bold text-gray-700">
                         Lottery Number
                       </p>
                     </div>
                     <motion.div
-                      className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-orange-600 text-center tracking-normal sm:tracking-widest break-all overflow-hidden"
+                      className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-gray-800 text-center tracking-normal sm:tracking-widest break-all overflow-hidden"
                       key={rollingNumber}
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -309,15 +317,15 @@ export default function iPhoneDrawPage() {
                   </div>
 
                   {/* Phone Number */}
-                  <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 border-4 border-orange-600 shadow-lg overflow-hidden min-w-0">
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-4 border-4 border-gray-500 shadow-lg overflow-hidden min-w-0">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                      <Phone className="w-5 h-5 md:w-6 md:h-6 text-orange-600 flex-shrink-0" />
+                      <Phone className="w-5 h-5 md:w-6 md:h-6 text-gray-700 flex-shrink-0" />
                       <p className="text-base md:text-lg font-bold text-gray-700">
                         Phone Number
                       </p>
                     </div>
                     <motion.div
-                      className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold text-orange-600 text-center tracking-normal sm:tracking-wider break-all overflow-hidden"
+                      className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold text-gray-800 text-center tracking-normal sm:tracking-wider break-all overflow-hidden"
                       key={rollingPhone}
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -340,17 +348,17 @@ export default function iPhoneDrawPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, type: "spring" }}
           >
-            {/* iPhone Image - Left Side */}
+            {/* Samsung S25 Ultra Image - Left Side (Winner State) */}
             <motion.div
               className="flex-shrink-0"
               initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: "spring" }}
             >
-              <div className="relative w-64 h-96 md:w-80 md:h-[500px]">
+              <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="iPhone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra Winner"
                   fill
                   className="object-contain rounded-2xl"
                 />
@@ -374,7 +382,7 @@ export default function iPhoneDrawPage() {
                   >
                     <span className="text-3xl md:text-4xl">🎉</span>
                   </motion.div>
-                  <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 bg-clip-text text-transparent">
+                  <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent">
                     WINNER! / አሸናፊ!
                   </h2>
                   <motion.div
@@ -389,7 +397,7 @@ export default function iPhoneDrawPage() {
 
               {/* Prize Card */}
               <motion.div
-                className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 shadow-2xl border-4 border-white w-full"
+                className="mb-4 p-4 rounded-2xl bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 shadow-2xl border-4 border-white w-full"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
@@ -403,40 +411,40 @@ export default function iPhoneDrawPage() {
               </motion.div>
 
               {/* Winner Details */}
-              <div className="bg-white rounded-3xl p-4 border-4 border-orange-500 shadow-2xl w-full mb-4 min-w-0">
+              <div className="bg-white rounded-3xl p-4 border-4 border-gray-400 shadow-2xl w-full mb-4 min-w-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0">
                   {/* Lottery Number */}
                   <motion.div
-                    className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl p-4 border-4 border-orange-600 shadow-lg overflow-hidden min-w-0"
+                    className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl p-4 border-4 border-gray-500 shadow-lg overflow-hidden min-w-0"
                     initial={{ x: -100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
                   >
                     <div className="flex items-center justify-center gap-2 mb-2">
-                      <Ticket className="w-5 h-5 md:w-6 md:h-6 text-orange-600 flex-shrink-0" />
-                      <p className="text-base md:text-lg font-bold text-orange-700">
+                      <Ticket className="w-5 h-5 md:w-6 md:h-6 text-gray-700 flex-shrink-0" />
+                      <p className="text-base md:text-lg font-bold text-gray-700">
                         Winning Ticket
                       </p>
                     </div>
-                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-black text-orange-600 text-center tracking-normal sm:tracking-widest break-all overflow-hidden">
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-black text-gray-800 text-center tracking-normal sm:tracking-widest break-all overflow-hidden">
                       {winner.lotteryNumber}
                     </div>
                   </motion.div>
 
                   {/* Phone Number */}
                   <motion.div
-                    className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl p-4 border-4 border-orange-600 shadow-lg overflow-hidden min-w-0"
+                    className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl p-4 border-4 border-gray-500 shadow-lg overflow-hidden min-w-0"
                     initial={{ x: 100, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.7 }}
                   >
                     <div className="flex items-center justify-center gap-2 mb-2">
-                      <Phone className="w-5 h-5 md:w-6 md:h-6 text-orange-600 flex-shrink-0" />
-                      <p className="text-base md:text-lg font-bold text-orange-700">
+                      <Phone className="w-5 h-5 md:w-6 md:h-6 text-gray-700 flex-shrink-0" />
+                      <p className="text-base md:text-lg font-bold text-gray-700">
                         Contact Number
                       </p>
                     </div>
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-mono font-black text-orange-600 text-center tracking-normal sm:tracking-wider break-all overflow-hidden">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-mono font-black text-gray-800 text-center tracking-normal sm:tracking-wider break-all overflow-hidden">
                       {winner.phoneNumber}
                     </div>
                   </motion.div>
@@ -446,7 +454,7 @@ export default function iPhoneDrawPage() {
               {/* Action Buttons */}
               <motion.button
                 onClick={resetDraw}
-                className="px-8 md:px-10 py-3 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-700 rounded-full text-white font-bold text-lg md:text-xl shadow-2xl hover:shadow-orange-500/50 transition-all border-4 border-white w-full md:w-auto"
+                className="px-8 md:px-10 py-3 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 rounded-full text-white font-bold text-lg md:text-xl shadow-2xl hover:shadow-gray-500/50 transition-all border-4 border-white w-full md:w-auto"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: 50 }}
