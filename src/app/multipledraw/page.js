@@ -6,7 +6,7 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 
 const API_BASE_URL =
-  "https://l3sskdcyods2udtlabrxsza2zy0bsrxo.lambda-url.us-east-1.on.aws/api/v2";
+  "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2";
 
 export default function MultipleDrawPage() {
   const [selectedDate, setSelectedDate] = useState("");
