@@ -5,7 +5,7 @@ import Confetti from "react-confetti";
 import { Trophy, Phone, Ticket, Sparkles, Star, Crown } from "lucide-react";
 import Image from "next/image";
 
-export default function IphoneDrawPage() {
+export default function SamsungDrawPage() {
   const [currentStep, setCurrentStep] = useState("idle"); // idle, drawing, winner
   const [winner, setWinner] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -15,7 +15,7 @@ export default function IphoneDrawPage() {
 
   // Prize configuration
   const PRIZE = {
-    amount: "New Iphone 17 Pro Max",
+    amount: "Samsung S25 Ultra",
     title: "GRAND PRIZE",
     titleAmharic: "ታላቅ ሽልማት",
     confettiColors: [
@@ -56,7 +56,7 @@ export default function IphoneDrawPage() {
 
   // Start drawing
   const startDrawing = async () => {
-    console.log("Starting New Iphone 17 Pro Max draw");
+    console.log("Starting Samsung draw");
     setCurrentStep("drawing");
     setShowConfetti(false);
 
@@ -165,8 +165,8 @@ export default function IphoneDrawPage() {
             >
               <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="New Iphone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra"
                   fill
                   className="object-contain rounded-2xl"
                   priority
@@ -186,12 +186,12 @@ export default function IphoneDrawPage() {
                 <div className="flex items-center justify-center md:justify-start gap-2 sm:gap-3 mb-2">
                   <Crown className="w-6 h-6 md:w-8 md:h-8 text-gray-700 animate-pulse flex-shrink-0" />
                   <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 bg-clip-text text-transparent drop-shadow-lg whitespace-nowrap">
-                    Iphone 17 Lottery Draw
+                    Samsung Lottery Draw
                   </h1>
                   <Crown className="w-6 h-6 md:w-8 md:h-8 text-gray-700 animate-pulse flex-shrink-0" />
                 </div>
                 <p className="text-lg md:text-xl text-gray-700 font-semibold">
-                  New Iphone 17 Prize Draw
+                  Samsung S25 Ultra Prize Draw
                 </p>
               </motion.div>
 
@@ -255,8 +255,8 @@ export default function IphoneDrawPage() {
             >
               <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="New Iphone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra"
                   fill
                   className="object-contain rounded-2xl"
                 />
@@ -357,8 +357,8 @@ export default function IphoneDrawPage() {
             >
               <div className="relative w-80 h-[480px] md:w-96 md:h-[600px]">
                 <Image
-                  src="/Apple-iPhone-17-Pro-Max.jpg"
-                  alt="New Iphone 17 Pro Max"
+                  src="/Samsung.jpg"
+                  alt="Samsung S25 Ultra Winner"
                   fill
                   className="object-contain rounded-2xl"
                 />
