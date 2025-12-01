@@ -80,6 +80,8 @@ export default function IphoneDrawPage() {
         },
         body: JSON.stringify({
           amount: 1000000,
+          startDate: "2025-11-27",
+          endDate: "2025-11-28"
         }),
       };
 
