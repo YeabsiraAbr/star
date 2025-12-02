@@ -64,24 +64,20 @@ export default function FiftyMultiplePage() {
     setDrawInfo(null);
 
     try {
-
       const apiUrl = `${API_BASE_URL}/ticket/drawLottery/60Million`;
 
       console.log("Calling API:", apiUrl);
-      console.log("Request body:", {
-        amount: 50000,
-        startDate,
-        endDate,
-      });
+      console.log("Processing", drawDates.length, "date ranges");
 
-      drawDates.map(async (dDate) => {
+      // Create an array of promises for all API calls
+      const apiPromises = drawDates.map(async (dDate) => {
+        console.log("Request body:", {
+          amount: 50000,
+          startDate: dDate.startDate,
+          endDate: dDate.endDate,
+        });
 
-          console.log("Request body:", {
-            amount: 50000,
-            startDate: dDate.startDate,
-            endDate: dDate.endDate,
-          });
-
+        try {
           const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
@@ -95,29 +91,48 @@ export default function FiftyMultiplePage() {
           });
 
           const data = await response.json();
-          console.log("API Response:", data);
+          console.log("API Response for", dDate.startDate, "to", dDate.endDate, ":", data);
 
           if (data.status === "SUCCESS" || data.status === "success") {
             // Handle both single winner and multiple winners
+            let winnersFromThisCall = [];
             if (data.winner) {
-              setWinners([data.winner]);
+              winnersFromThisCall = [data.winner];
             } else if (data.winners && Array.isArray(data.winners)) {
-              setWinners(data.winners);
+              winnersFromThisCall = data.winners;
             } else if (data.data && Array.isArray(data.data)) {
-              setWinners(data.data);
-            } else {
-              setError("No winners found in response");
+              winnersFromThisCall = data.data;
             }
-            setDrawInfo({
-              startDate,
-              endDate,
-            });
-            setError("");
+            return winnersFromThisCall;
           } else {
-            setError(data.message || "Failed to draw winners");
-          } 
-        })
-        console.log('Winners list: ', winners);
+            console.warn("API call failed for", dDate.startDate, "to", dDate.endDate, ":", data.message);
+            return [];
+          }
+        } catch (err) {
+          console.error("Error calling API for", dDate.startDate, "to", dDate.endDate, ":", err);
+          return [];
+        }
+      });
+
+      // Wait for all API calls to complete
+      const allResults = await Promise.all(apiPromises);
+      
+      // Flatten all winners into a single array
+      const allWinners = allResults.flat();
+      
+      console.log('Total winners collected:', allWinners.length);
+      console.log('Winners list:', allWinners);
+
+      if (allWinners.length > 0) {
+        setWinners(allWinners);
+        setDrawInfo({
+          startDate: drawDates[0].startDate,
+          endDate: drawDates[drawDates.length - 1].endDate,
+        });
+        setError("");
+      } else {
+        setError("No winners found from any date range");
+      }
     } catch (err) {
       console.error("Error calling API:", err);
       setError("Network error. Please check your connection and try again.");
