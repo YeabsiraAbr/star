@@ -16,6 +16,27 @@ export default function FiftyMultiplePage() {
   const [error, setError] = useState("");
   const [drawInfo, setDrawInfo] = useState(null);
 
+  const drawDates = [
+    { startDate: "2025-10-15", endDate: "2025-10-21" },
+    { startDate: "2025-10-22", endDate: "2025-10-23" },
+    { startDate: "2025-10-24", endDate: "2025-10-25" },
+    { startDate: "2025-10-27", endDate: "2025-10-28" },
+    { startDate: "2025-10-29", endDate: "2025-10-30" },
+    { startDate: "2025-10-31", endDate: "2025-11-01" },
+    { startDate: "2025-11-03", endDate: "2025-11-04" },
+    { startDate: "2025-11-05", endDate: "2025-11-06" },
+    { startDate: "2025-11-07", endDate: "2025-11-08" },
+    { startDate: "2025-11-10", endDate: "2025-11-11" },
+    { startDate: "2025-11-12", endDate: "2025-11-13" },
+    { startDate: "2025-11-14", endDate: "2025-11-15" },
+    { startDate: "2025-11-17", endDate: "2025-11-18" },
+    { startDate: "2025-11-19", endDate: "2025-11-20" },
+    { startDate: "2025-11-21", endDate: "2025-11-22" },
+    { startDate: "2025-11-24", endDate: "2025-11-25" },
+    { startDate: "2025-11-26", endDate: "2025-11-27" },
+    { startDate: "2025-11-28", endDate: "2025-11-29" },
+  ]
+
   // Set default dates (today as end date, 7 days ago as start date)
   useEffect(() => {
     const today = new Date();
@@ -43,6 +64,7 @@ export default function FiftyMultiplePage() {
     setDrawInfo(null);
 
     try {
+
       const apiUrl = `${API_BASE_URL}/ticket/drawLottery/60Million`;
 
       console.log("Calling API:", apiUrl);
@@ -52,40 +74,50 @@ export default function FiftyMultiplePage() {
         endDate,
       });
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: 50000,
-          startDate,
-          endDate,
-        }),
-      });
+      drawDates.map(async (dDate) => {
 
-      const data = await response.json();
-      console.log("API Response:", data);
+          console.log("Request body:", {
+            amount: 50000,
+            startDate: dDate.startDate,
+            endDate: dDate.endDate,
+          });
 
-      if (data.status === "SUCCESS" || data.status === "success") {
-        // Handle both single winner and multiple winners
-        if (data.winner) {
-          setWinners([data.winner]);
-        } else if (data.winners && Array.isArray(data.winners)) {
-          setWinners(data.winners);
-        } else if (data.data && Array.isArray(data.data)) {
-          setWinners(data.data);
-        } else {
-          setError("No winners found in response");
-        }
-        setDrawInfo({
-          startDate,
-          endDate,
-        });
-        setError("");
-      } else {
-        setError(data.message || "Failed to draw winners");
-      }
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: 50000,
+              startDate: dDate.startDate,
+              endDate: dDate.endDate,
+            }),
+          });
+
+          const data = await response.json();
+          console.log("API Response:", data);
+
+          if (data.status === "SUCCESS" || data.status === "success") {
+            // Handle both single winner and multiple winners
+            if (data.winner) {
+              setWinners([data.winner]);
+            } else if (data.winners && Array.isArray(data.winners)) {
+              setWinners(data.winners);
+            } else if (data.data && Array.isArray(data.data)) {
+              setWinners(data.data);
+            } else {
+              setError("No winners found in response");
+            }
+            setDrawInfo({
+              startDate,
+              endDate,
+            });
+            setError("");
+          } else {
+            setError(data.message || "Failed to draw winners");
+          } 
+        })
+        console.log('Winners list: ', winners);
     } catch (err) {
       console.error("Error calling API:", err);
       setError("Network error. Please check your connection and try again.");
