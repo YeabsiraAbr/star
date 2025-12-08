@@ -71,8 +71,8 @@ export default function MillionLotteryPage() {
         },
         body: JSON.stringify({
           amount: 1000000,
-          startDate: "2025-11-24",
-          endDate: "2025-11-30"
+          startDate: "2025-12-01",
+          endDate: "2025-12-07"
         }),
       };
 
