@@ -8,9 +8,7 @@ import { ShipWheelIcon as Wheel } from "lucide-react";
 const names = [
   "Yeabsira",
   "Nathnael",
-  "Dawit",
   "Eleni",
-  "Tekle",
   "Kelab",
   "Solomon",
   "Tadel",
@@ -22,7 +20,6 @@ const names = [
   "Yoseph-Call-2",
   "Ermias",
   "Girum",
-  "Tsion",
   "Wende",
   "Haymi",
   "Haymi2",
