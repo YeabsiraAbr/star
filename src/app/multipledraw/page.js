@@ -9,115 +9,133 @@ const API_BASE_URL =
   "https://v8crgwv139.execute-api.us-east-1.amazonaws.com/Stage/api/v2";
 
 export default function MultipleDrawPage() {
-  const [selectedDate, setSelectedDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [winners, setWinners] = useState(null);
   const [error, setError] = useState("");
-  const [drawDate, setDrawDate] = useState("");
+  const [anticipationStep, setAnticipationStep] = useState("idle"); // idle, loading, revealing, complete
+  const [rollingNumbers, setRollingNumbers] = useState([]);
 
-  // Set today's date as default
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    setSelectedDate(today);
-  }, []);
+  // Generate random rolling numbers for anticipation
+  const generateRollingNumber = () => {
+    return Math.floor(1000000 + Math.random() * 9000000).toString();
+  };
+
+  const generateRollingPhone = () => {
+    return "+2519" + Math.floor(10000000 + Math.random() * 90000000).toString();
+  };
 
   const handleDraw = async () => {
-    if (!selectedDate) {
-      setError("Please select a date");
-      return;
-    }
-
     setIsLoading(true);
     setError("");
     setWinners(null);
+    setAnticipationStep("loading");
+
+    // Phase 1: Anticipation - Rolling numbers animation
+    const rollingInterval = setInterval(() => {
+      const randomNumbers = Array.from({ length: 5 }, () => ({
+        ticket: generateRollingNumber(),
+        phone: generateRollingPhone(),
+      }));
+      setRollingNumbers(randomNumbers);
+    }, 100);
+
+    // Wait for anticipation period (3 seconds)
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    clearInterval(rollingInterval);
+
+    setAnticipationStep("revealing");
+
+    // Small delay before revealing
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     try {
-      const apiUrl = `${API_BASE_URL}/ticket/multi-draw/60Million`;
+      // Load Excel file from public folder
+      const excelFilePath =
+        "/daily_winners_60Million_2025-11-29_to_2025-12-22_1000.xlsx";
+      console.log("Loading Excel file:", excelFilePath);
 
-      console.log("Calling API:", apiUrl);
-      console.log("Request body:", { date: selectedDate, amount: 1000 });
+      const response = await fetch(excelFilePath);
+      if (!response.ok) {
+        throw new Error("Failed to load Excel file");
+      }
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          date: selectedDate,
-          amount: 1000,
-        }),
-      });
+      const arrayBuffer = await response.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
 
-      const data = await response.json();
-      console.log("API Response:", data);
+      // Get the first sheet
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
 
-      if (data.status === "success" && data.winners) {
-        setWinners(data.winners);
-        setDrawDate(data.date);
+      // Convert to JSON with header row
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+      console.log("Excel data loaded:", jsonData.length, "rows");
+
+      // Skip header row and convert to winner objects
+      const winnersData = [];
+      for (let i = 1; i < jsonData.length; i++) {
+        const row = jsonData[i];
+        if (row && row.length > 0 && row[1]) {
+          winnersData.push({
+            ticketNumber: String(row[1] || "").trim(),
+            phoneNumber: String(row[2] || "").trim(),
+            amount: row[3] || 1000,
+            drawnAt: row[4]
+              ? new Date(row[4]).toISOString()
+              : new Date().toISOString(),
+            lottery: row[5] || "",
+            ticketGroup: row[6] || "",
+            user: row[7] || "",
+            _id: `excel-${i}`,
+          });
+        }
+      }
+
+      console.log("Parsed winners:", winnersData.length);
+
+      if (winnersData.length > 0) {
+        // Reveal winners one by one with delay
+        setAnticipationStep("revealing");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        setWinners(winnersData);
+        setAnticipationStep("complete");
         setError("");
       } else {
-        setError(data.message || "Failed to draw winners");
+        setError("No winners found in Excel file");
+        setAnticipationStep("idle");
       }
     } catch (err) {
-      console.error("Error calling API:", err);
-      setError("Network error. Please check your connection and try again.");
+      console.error("Error loading Excel file:", err);
+      setError(
+        "Failed to load Excel file. Please ensure the file exists in the public folder."
+      );
+      setAnticipationStep("idle");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const exportToExcel = () => {
-    if (!winners || winners.length === 0) {
-      alert("No winners to export");
-      return;
+  const exportToExcel = async () => {
+    try {
+      // Download the existing Excel file from public folder
+      const excelFilePath =
+        "/daily_winners_60Million_2025-11-29_to_2025-12-22_1000.xlsx";
+
+      const response = await fetch(excelFilePath);
+      if (!response.ok) {
+        throw new Error("Failed to load Excel file");
+      }
+
+      const blob = await response.blob();
+      saveAs(
+        blob,
+        "daily_winners_60Million_2025-11-29_to_2025-12-22_1000.xlsx"
+      );
+    } catch (err) {
+      console.error("Error downloading Excel file:", err);
+      alert("Failed to download Excel file. Please try again.");
     }
-
-    // Prepare data for Excel
-    const excelData = winners.map((winner, index) => ({
-      "S.No": index + 1,
-      "Ticket Number": winner.ticketNumber,
-      "Phone Number": winner.phoneNumber,
-      Amount: winner.amount,
-      "Drawn At": new Date(winner.drawnAt).toLocaleString(),
-      "Lottery ID": winner.lottery,
-      "Ticket Group": winner.ticketGroup,
-      "User ID": winner.user,
-    }));
-
-    // Create workbook and worksheet
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Winners");
-
-    // Set column widths
-    const columnWidths = [
-      { wch: 8 }, // S.No
-      { wch: 15 }, // Ticket Number
-      { wch: 18 }, // Phone Number
-      { wch: 12 }, // Amount
-      { wch: 25 }, // Drawn At
-      { wch: 30 }, // Lottery ID
-      { wch: 30 }, // Ticket Group
-      { wch: 30 }, // User ID
-    ];
-    worksheet["!cols"] = columnWidths;
-
-    // Generate Excel file
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    // Create blob and download
-    const blob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    const fileName = `60Million_Winners_${selectedDate.replace(
-      /-/g,
-      "_"
-    )}.xlsx`;
-    saveAs(blob, fileName);
   };
 
   return (
@@ -157,96 +175,107 @@ export default function MultipleDrawPage() {
           </div>
         </motion.div>
 
-        {/* Date Selection Card */}
+        {/* Start Draw Button Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 md:p-10 shadow-2xl border-4 border-gray-400 mb-8"
+          className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 md:p-10 shadow-2xl border-4 border-gray-400 mb-8 text-center"
         >
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-6">
-            <div className="flex-1 w-full">
-              <label className="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg text-white">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <span>Select Date</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-5 py-4 border-4 border-gray-400 rounded-xl text-lg font-semibold text-gray-800 bg-white focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all shadow-lg"
-                  max={new Date().toISOString().split("T")[0]}
-                  style={{
-                    colorScheme: "light",
-                    backgroundColor: "white",
+          <motion.button
+            onClick={handleDraw}
+            disabled={isLoading}
+            className={`px-12 py-6 rounded-xl font-bold text-2xl shadow-2xl transition-all border-4 border-white ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 text-white hover:shadow-gray-600/50"
+            }`}
+            whileHover={!isLoading ? { scale: 1.05 } : {}}
+            whileTap={!isLoading ? { scale: 0.95 } : {}}
+            animate={!isLoading ? { scale: [1, 1.02, 1] } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-3">
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    ease: "linear",
                   }}
-                />
-                <style jsx>{`
-                  input[type="date"]::-webkit-calendar-picker-indicator {
-                    cursor: pointer;
-                    background-color: #3b82f6;
-                    border-radius: 4px;
-                    padding: 4px;
-                    margin-right: 4px;
-                  }
-                  input[type="date"]::-webkit-calendar-picker-indicator:hover {
-                    background-color: #2563eb;
-                  }
-                  input[type="date"] {
-                    color: #1f2937;
-                  }
-                  input[type="date"]:focus {
-                    border-color: #3b82f6;
-                    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-                  }
-                `}</style>
-              </div>
-              {selectedDate && (
-                <p className="mt-2 text-sm text-gray-600 font-medium">
-                  Selected:{" "}
-                  {new Date(selectedDate).toLocaleDateString("en-US", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              )}
-            </div>
-            <motion.button
-              onClick={handleDraw}
-              disabled={isLoading || !selectedDate}
-              className={`px-10 py-4 rounded-xl font-bold text-xl shadow-2xl transition-all border-4 border-white min-w-[180px] ${
-                isLoading || !selectedDate
-                  ? "bg-gray-400 cursor-not-allowed text-white"
-                  : "bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 text-white hover:shadow-gray-600/50 hover:scale-105 active:scale-95"
-              }`}
-              whileHover={!isLoading && selectedDate ? { scale: 1.05 } : {}}
-              whileTap={!isLoading && selectedDate ? { scale: 0.95 } : {}}
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    ⏳
-                  </motion.span>
-                  Drawing...
-                </span>
-              ) : (
-                "🎲 Start Draw"
-              )}
-            </motion.button>
-          </div>
+                >
+                  ⏳
+                </motion.span>
+                Drawing Winners...
+              </span>
+            ) : (
+              "🎲 Start Draw / ዕጣ ጀምር"
+            )}
+          </motion.button>
         </motion.div>
+
+        {/* Anticipation Animation */}
+        {(anticipationStep === "loading" ||
+          anticipationStep === "revealing") && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 md:p-10 shadow-2xl border-4 border-gray-400 mb-8"
+          >
+            <motion.div
+              className="text-center mb-6"
+              animate={{ opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-2">
+                🎰 Drawing Winners...
+              </h2>
+              <p className="text-xl text-gray-600">እየወጣ ነው...</p>
+            </motion.div>
+
+            {/* Rolling Numbers Display */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rollingNumbers.map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-gradient-to-br from-gray-100 to-white rounded-xl p-4 border-4 border-gray-400"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{
+                    duration: 0.5,
+                    repeat: Infinity,
+                    delay: index * 0.1,
+                  }}
+                >
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-gray-600 mb-2">
+                      #{index + 1}
+                    </p>
+                    <motion.div
+                      className="text-2xl font-mono font-bold text-gray-800 mb-1"
+                      key={item.ticket}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.1 }}
+                    >
+                      {item.ticket}
+                    </motion.div>
+                    <motion.div
+                      className="text-lg font-mono font-bold text-gray-700"
+                      key={item.phone}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.1 }}
+                    >
+                      {item.phone}
+                    </motion.div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Error Message */}
         {error && (
@@ -279,20 +308,18 @@ export default function MultipleDrawPage() {
                   <span className="text-4xl">🎉</span>
                   Winners ({winners.length})
                 </motion.h2>
-                {drawDate && (
-                  <div className="flex items-center gap-2 text-gray-700 font-semibold">
-                    <Calendar className="w-5 h-5 text-blue-600" />
-                    <span>
-                      Drawn on:{" "}
-                      {new Date(drawDate).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 text-gray-700 font-semibold">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <span>
+                    Drawn on:{" "}
+                    {new Date().toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
               </div>
               <motion.button
                 onClick={exportToExcel}
@@ -377,8 +404,7 @@ export default function MultipleDrawPage() {
               Ready to Draw Winners
             </h3>
             <p className="text-lg text-gray-600">
-              Select a date above and click "Start Draw" to begin the lottery
-              draw
+              Click "Start Draw" above to begin the lottery draw
             </p>
           </motion.div>
         )}
