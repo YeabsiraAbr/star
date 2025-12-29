@@ -17,25 +17,17 @@ export default function FiftyMultiplePage() {
   const [drawInfo, setDrawInfo] = useState(null);
 
   const drawDates = [
-    { startDate: "2025-10-15", endDate: "2025-10-21" },
-    { startDate: "2025-10-22", endDate: "2025-10-23" },
-    { startDate: "2025-10-24", endDate: "2025-10-25" },
-    { startDate: "2025-10-27", endDate: "2025-10-28" },
-    { startDate: "2025-10-29", endDate: "2025-10-30" },
-    { startDate: "2025-10-31", endDate: "2025-11-01" },
-    { startDate: "2025-11-03", endDate: "2025-11-04" },
-    { startDate: "2025-11-05", endDate: "2025-11-06" },
-    { startDate: "2025-11-07", endDate: "2025-11-08" },
-    { startDate: "2025-11-10", endDate: "2025-11-11" },
-    { startDate: "2025-11-12", endDate: "2025-11-13" },
-    { startDate: "2025-11-14", endDate: "2025-11-15" },
-    { startDate: "2025-11-17", endDate: "2025-11-18" },
-    { startDate: "2025-11-19", endDate: "2025-11-20" },
-    { startDate: "2025-11-21", endDate: "2025-11-22" },
-    { startDate: "2025-11-24", endDate: "2025-11-25" },
-    { startDate: "2025-11-26", endDate: "2025-11-27" },
-    { startDate: "2025-11-28", endDate: "2025-11-29" },
-  ]
+    { startDate: "2025-12-01", endDate: "2025-12-02" },
+    { startDate: "2025-12-03", endDate: "2025-12-04" },
+    { startDate: "2025-12-05", endDate: "2025-12-06" },
+    { startDate: "2025-12-08", endDate: "2025-12-09" },
+    { startDate: "2025-12-10", endDate: "2025-12-11" },
+    { startDate: "2025-12-12", endDate: "2025-12-13" },
+    { startDate: "2025-12-15", endDate: "2025-12-16" },
+    { startDate: "2025-12-17", endDate: "2025-12-18" },
+    { startDate: "2025-12-19", endDate: "2025-12-20" },
+    { startDate: "2025-12-22", endDate: "2025-12-23" },
+  ];
 
   // Set default dates (today as end date, 7 days ago as start date)
   useEffect(() => {
@@ -91,7 +83,14 @@ export default function FiftyMultiplePage() {
           });
 
           const data = await response.json();
-          console.log("API Response for", dDate.startDate, "to", dDate.endDate, ":", data);
+          console.log(
+            "API Response for",
+            dDate.startDate,
+            "to",
+            dDate.endDate,
+            ":",
+            data
+          );
 
           if (data.status === "SUCCESS" || data.status === "success") {
             // Handle both single winner and multiple winners
@@ -105,23 +104,37 @@ export default function FiftyMultiplePage() {
             }
             return winnersFromThisCall;
           } else {
-            console.warn("API call failed for", dDate.startDate, "to", dDate.endDate, ":", data.message);
+            console.warn(
+              "API call failed for",
+              dDate.startDate,
+              "to",
+              dDate.endDate,
+              ":",
+              data.message
+            );
             return [];
           }
         } catch (err) {
-          console.error("Error calling API for", dDate.startDate, "to", dDate.endDate, ":", err);
+          console.error(
+            "Error calling API for",
+            dDate.startDate,
+            "to",
+            dDate.endDate,
+            ":",
+            err
+          );
           return [];
         }
       });
 
       // Wait for all API calls to complete
       const allResults = await Promise.all(apiPromises);
-      
+
       // Flatten all winners into a single array
       const allWinners = allResults.flat();
-      
-      console.log('Total winners collected:', allWinners.length);
-      console.log('Winners list:', allWinners);
+
+      console.log("Total winners collected:", allWinners.length);
+      console.log("Winners list:", allWinners);
 
       if (allWinners.length > 0) {
         setWinners(allWinners);
