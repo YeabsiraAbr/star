@@ -517,10 +517,10 @@ export default function EleganceConcertLottery() {
       {/* Background */}
       <div className="absolute inset-0">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/Elegance NY copy.jpg')" }}
+          className="absolute inset-0 bg-contain bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/concert3.jpeg')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/60" />
       </div>
 
       {/* Main Content */}
